@@ -102,6 +102,7 @@ public class CreateCSV {
             int len = value.length();
             if (len ==0) return;
             value = escape(value, len);
+            if (inMemoryIndex.contains(value)) return;
             line[0] = value;
             writer.writeNext(line);
             inMemoryIndex.add(value);
