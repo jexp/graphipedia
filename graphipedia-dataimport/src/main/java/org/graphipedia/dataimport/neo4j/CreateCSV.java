@@ -78,7 +78,7 @@ public class CreateCSV {
         System.out.println("Importing links...");
         try (CSVWriter writer = csvWriter(dataDir, "links")) {
             long startTime = System.currentTimeMillis();
-            writer.writeNext(new String[]{":START_ID,:END_ID"});
+            writer.writeNext(new String[]{":START_ID",":END_ID"});
             RelationshipParser relationshipCreator = new RelationshipParser(writer);
             relationshipCreator.parse(inputFile);
             long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
