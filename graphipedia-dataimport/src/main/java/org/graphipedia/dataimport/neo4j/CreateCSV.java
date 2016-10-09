@@ -25,7 +25,9 @@ import com.opencsv.CSVWriter;
 import org.graphipedia.dataimport.SimpleStaxParser;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
@@ -34,14 +36,14 @@ import static java.util.Collections.singletonList;
 
 public class CreateCSV {
 
-    private final Set<String> inMemoryIndex;
+    private final Map<String,Integer> inMemoryIndex;
     private final String dataDir;
     private final String inputFile;
 
     public CreateCSV(String dataDir, String inputFile) throws IOException {
         this.dataDir = dataDir;
         this.inputFile = inputFile;
-        inMemoryIndex = new HashSet<>(13_000_000, 0.95f);
+        inMemoryIndex = new HashMap<>(13_000_000, 0.95f);
     }
 
     public static void main(String[] args) throws Exception {
@@ -57,14 +59,14 @@ public class CreateCSV {
     }
 
     public void createNodes() throws Exception {
-        System.out.println("Importing pages...");
+        System.out.println("Creating pages CSV...");
         try (CSVWriter writer = csvWriter(dataDir, "pages")) {
             long startTime = System.currentTimeMillis();
             NodeParser nodeCreator = new NodeParser(writer);
-            writer.writeNext(new String[]{"title:ID"});
+            writer.writeNext(new String[]{":ID","title"});
             nodeCreator.parse(inputFile);
             long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
-            System.out.printf("\n%d pages imported in %d seconds.\n", nodeCreator.pageCount, elapsedSeconds);
+            System.out.printf("\n%d pages written in %d seconds.\n", nodeCreator.pageCount, elapsedSeconds);
         }
     }
 
@@ -75,21 +77,21 @@ public class CreateCSV {
     }
 
     public void createRelationships() throws Exception {
-        System.out.println("Importing links...");
+        System.out.println("Creating CSV for links...");
         try (CSVWriter writer = csvWriter(dataDir, "links")) {
             long startTime = System.currentTimeMillis();
             writer.writeNext(new String[]{":START_ID",":END_ID"});
             RelationshipParser relationshipCreator = new RelationshipParser(writer);
             relationshipCreator.parse(inputFile);
             long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
-            System.out.printf("\n%d links imported in %d seconds; %d broken links ignored\n",
+            System.out.printf("\n%d links written in %d seconds; %d broken links ignored\n",
                     relationshipCreator.linkCount, elapsedSeconds, relationshipCreator.badLinkCount);
         }
     }
 
     private class NodeParser extends SimpleStaxParser {
         private final CSVWriter writer;
-        String[] line = new String[1];
+        String[] line = new String[2];
         int pageCount;
 
         public NodeParser(CSVWriter writer) {
@@ -102,10 +104,11 @@ public class CreateCSV {
             int len = value.length();
             if (len ==0) return;
             value = escape(value, len);
-            if (inMemoryIndex.contains(value)) return;
-            line[0] = value;
+            if (inMemoryIndex.containsKey(value)) return;
+            line[0] = String.valueOf(pageCount);
+            line[1] = value;
             writer.writeNext(line);
-            inMemoryIndex.add(value);
+            inMemoryIndex.put(value,pageCount);
             pageCount++;
         }
     }
@@ -132,10 +135,10 @@ public class CreateCSV {
             int len = value.length();
             if (len ==0) return;
             value = escape(value,len);
-            if (element.charAt(0) == 't') line[0] = value;
+            if (element.charAt(0) == 't') line[0] = String.valueOf(inMemoryIndex.get(value));
             else {
-                if (inMemoryIndex.contains(value)) {
-                    line[1]=value;
+                if (inMemoryIndex.containsKey(value)) {
+                    line[1]=String.valueOf(inMemoryIndex.get(value));
                     writer.writeNext(line);
                     linkCount++;
                 } else {
