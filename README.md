@@ -38,10 +38,16 @@ as decompressing only) and an additional 10 minutes to ImportGraph.
 (Note that disk I/O is the critical factor here: the same import will easily take several hours with an old 5400RPM drive.)
 
 
-Creating CSV
-------------
+Creating & Importing CSV
+------------------------
 
-Perform step 1. as explained before
+You can also find the files on data.neo4j.com/dbpedia:
+
+* [pages.csv.gz](http://data.neo4j.com.s3.amazonaws.com/dbpedia/pages.csv.gz)
+* [links.csv.gz](http://data.neo4j.com.s3.amazonaws.com/dbpedia/links.csv.gz)
+
+
+Perform *step 1.* as explained above to extract the page information from the dump
 
 2.  Run ImportGraph to create a Neo4j database with nodes and relationships into
     a `graphdb` directory
