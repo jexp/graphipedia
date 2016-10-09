@@ -22,7 +22,12 @@ Assuming you downloaded `pages-articles.xml.bz2`, follow these steps:
 2.  Run ImportGraph to create a Neo4j database with nodes and relationships into
     a `graphdb` directory
 
+
     java -Xmx3G -classpath graphipedia-dataimport.jar org.graphipedia.dataimport.neo4j.ImportGraph enwiki-links.xml graphdb
+
+or
+
+    mvn exec:java -Dexec.mainClass="org.graphipedia.dataimport.neo4j.ImportGraph" -Dexec.args="enwiki-links.xml csv-dir"
 
 Just to give an idea, enwiki-20130204-pages-articles.xml.bz2 is 9.1G and
 contains almost 10M pages, resulting in over 92M links to be extracted.
@@ -32,10 +37,26 @@ as decompressing only) and an additional 10 minutes to ImportGraph.
 
 (Note that disk I/O is the critical factor here: the same import will easily take several hours with an old 5400RPM drive.)
 
+
+Creating CSV
+------------
+
+Perform step 1. as explained before
+
+2.  Run ImportGraph to create a Neo4j database with nodes and relationships into
+    a `graphdb` directory
+
+
+    java -Xmx3G -classpath graphipedia-dataimport.jar org.graphipedia.dataimport.neo4j.CreateCSV enwiki-links.xml csv-dir
+
+or
+    
+    mvn exec:java -Dexec.mainClass="org.graphipedia.dataimport.neo4j.CreateCSV" -Dexec.args="enwiki-links.xml csv-dir"
+
 Querying
 --------
 
-The [Neo4j browser](http://blog.neo4j.org/2013/10/neo4j-200-m06-introducing-neo4js-browser.html) can be used to query and visualise
+The [Neo4j browser](neo4j.com/developer/guide-neo4j-browser) can be used to query and visualise
 the imported graph. Here are some sample Cypher queries.
 
 Show all pages linked to a given starting page - e.g. "Neo4j":
