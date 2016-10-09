@@ -99,6 +99,9 @@ public class CreateCSV {
 
         @Override
         protected void handleElement(String element, String value) {
+            int len = value.length();
+            if (len ==0) return;
+            if (value.charAt(len-1)=='\\') value = value.substring(0,len-1);
             line[0] = value;
             writer.writeNext(line);
             inMemoryIndex.add(value);
@@ -119,6 +122,9 @@ public class CreateCSV {
 
         @Override
         protected void handleElement(String element, String value) {
+            int len = value.length();
+            if (len ==0) return;
+            if (value.charAt(len-1)=='\\') value = value.substring(0,len-1);
             if (element.charAt(0) == 't') line[0] = value;
             else {
                 if (inMemoryIndex.contains(value)) {
