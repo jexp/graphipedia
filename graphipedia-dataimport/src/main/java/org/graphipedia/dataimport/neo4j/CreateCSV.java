@@ -101,12 +101,18 @@ public class CreateCSV {
         protected void handleElement(String element, String value) {
             int len = value.length();
             if (len ==0) return;
-            if (value.charAt(len-1)=='\\') value = value.substring(0,len-1);
+            value = escape(value, len);
             line[0] = value;
             writer.writeNext(line);
             inMemoryIndex.add(value);
             pageCount++;
         }
+    }
+
+    private static String escape(String value, int len) {
+        if (value.charAt(len-1)=='\\') value = value.substring(0,len-1);
+        if (value.indexOf('\\')!=-1) value = value.replaceAll("\\\\","\\\\\\\\");
+        return value;
     }
 
     private class RelationshipParser extends SimpleStaxParser {
@@ -124,7 +130,7 @@ public class CreateCSV {
         protected void handleElement(String element, String value) {
             int len = value.length();
             if (len ==0) return;
-            if (value.charAt(len-1)=='\\') value = value.substring(0,len-1);
+            value = escape(value,len);
             if (element.charAt(0) == 't') line[0] = value;
             else {
                 if (inMemoryIndex.contains(value)) {
