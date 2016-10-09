@@ -52,6 +52,19 @@ Perform step 1. as explained before
 or
     
     mvn exec:java -Dexec.mainClass="org.graphipedia.dataimport.neo4j.CreateCSV" -Dexec.args="enwiki-links.xml csv-dir"
+    
+3. Importing the CSV using `neo4j-import`
+  
+
+    $NEO4J_HOME/bin/neo4j-import --into graphipedia.db --nodes:Page pages.csv.gz --relationships:Link links.csv.gz
+    
+4. Create the index
+
+    In Neo4j Browser, Cypher-Shell or Neo4j-Shell run this:
+
+    
+    CREATE CONSTRAINT ON (p:Page) ASSERT p.title IS UNIQUE;
+
 
 Querying
 --------
