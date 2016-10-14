@@ -17,17 +17,22 @@ Assuming you downloaded `pages-articles.xml.bz2`, follow these steps:
 1.  Run ExtractLinks to create a smaller intermediate XML file containing page titles
     and links only. The best way to do this is decompress the bzip2 file and pipe the output directly to ExtractLinks:
 
+    ```
     bzip2 -dc pages-articles.xml.bz2 | java -classpath graphipedia-dataimport.jar org.graphipedia.dataimport.ExtractLinks - enwiki-links.xml
+    ```
 
 2.  Run ImportGraph to create a Neo4j database with nodes and relationships into
     a `graphdb` directory
 
-
+    ```
     java -Xmx3G -classpath graphipedia-dataimport.jar org.graphipedia.dataimport.neo4j.ImportGraph enwiki-links.xml graphdb
+    ```
 
-or
+    or
 
+    ```
     mvn exec:java -Dexec.mainClass="org.graphipedia.dataimport.neo4j.ImportGraph" -Dexec.args="enwiki-links.xml csv-dir"
+    ```
 
 Just to give an idea, enwiki-20130204-pages-articles.xml.bz2 is 9.1G and
 contains almost 10M pages, resulting in over 92M links to be extracted.
@@ -52,25 +57,29 @@ Perform *step 1.* as explained above to extract the page information from the du
 2.  Run ImportGraph to create a Neo4j database with nodes and relationships into
     a `graphdb` directory
 
-
+    ```
     java -Xmx3G -classpath graphipedia-dataimport.jar org.graphipedia.dataimport.neo4j.CreateCSV enwiki-links.xml csv-dir
+    ```
 
-or
-    
+    or
+
+    ```
     mvn exec:java -Dexec.mainClass="org.graphipedia.dataimport.neo4j.CreateCSV" -Dexec.args="enwiki-links.xml csv-dir"
-    
-3. Importing the CSV using `neo4j-import`
-  
+    ```
 
+3. Importing the CSV using `neo4j-import`
+
+    ```
     $NEO4J_HOME/bin/neo4j-import --into graphipedia.db --nodes:Page pages.csv.gz --relationships:Link links.csv.gz
-    
+    ```
+
 4. Create the index
 
     In Neo4j Browser, Cypher-Shell or Neo4j-Shell run this:
 
-    
+    ```
     CREATE CONSTRAINT ON (p:Page) ASSERT p.title IS UNIQUE;
-
+    ```
 
 Querying
 --------
@@ -80,11 +89,15 @@ the imported graph. Here are some sample Cypher queries.
 
 Show all pages linked to a given starting page - e.g. "Neo4j":
 
-    MATCH (p0:Page {title:'Neo4j'}) -[Link]- (p:Page)
-    RETURN p0, p
+```
+MATCH (p0:Page {title:'Neo4j'}) -[Link]- (p:Page)
+RETURN p0, p
+```
 
 Find how two pages - e.g. "Neo4j" and "Kevin Bacon" - are connected:
 
-    MATCH (p0:Page {title:'Neo4j'}), (p1:Page {title:'Kevin Bacon'}),
-      p = shortestPath((p0)-[*..6]-(p1))
-    RETURN p
+```
+MATCH (p0:Page {title:'Neo4j'}), (p1:Page {title:'Kevin Bacon'}),
+  p = shortestPath((p0)-[*..6]-(p1))
+RETURN p
+```
